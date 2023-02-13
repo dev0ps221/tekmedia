@@ -6,7 +6,7 @@
         $conn = new CrudConnection(null,'root',null,$dbname='tekmedia');
         $conn->__connect();
         include_once('tekmedia.php');
-        $tm = new TekMedia($conn);
+        $tm = new TekMediaManager($conn);
         print_r($tm->getuploads());
         if($action == 'doupload' ){
             $filescount = count($content['name']);

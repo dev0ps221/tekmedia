@@ -1,6 +1,6 @@
 <?php
 
-    class TekMedia{
+    class TekMediaManager{
         private $selfdir;
         private $uploaddir;
         private $uploadtable = "uploads";
@@ -29,6 +29,14 @@
 
         function registerfile($type,$content,$options=""){
             return $this->conn->insert_into_uploads(['type'=>$type,'content'=>$content,'options'=>$options]);
+        }
+
+        function removefile($id){
+
+        }
+
+        function getfile($id){
+            return $this->conn->select_file_entry($id);
         }
 
         function __construct($crud){
