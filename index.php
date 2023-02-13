@@ -1,36 +1,7 @@
 <?php
-
-    class TekMedia{
-        private $selfdir;
-        private $uploaddir;
-
-
-        function uploadfile($type,$target,$image){
-            $uploaddir = $this->uploaddir."/".$target;
-            if(move_uploaded_file($image['tmp_name'],$uploaddir)){
-                return $target;
-            }else{
-                return false;
-            }
-        }
-
-        function deleteuploadedfile($filepath){
-            if(unlink($filepath)){
-                return true;
-            }else{
-                return $filepath;
-            }
-        }
-
-        function registerfile($type,$content){
-
-        }
-
-        function __construct($crud){
-            $this->conn = $crud; 
-        }
-
-
-    }
+    include_once('crudconnection.php');
+    $conn = new CrudConnection(null,null,null,$dbname='tekmedia');
+    print_r($conn);
+    include_once('tekmedia.php');
 
 ?>
