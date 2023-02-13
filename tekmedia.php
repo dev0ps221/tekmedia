@@ -7,11 +7,7 @@
         public $media;
         public $options;
         function remove(){
-            if($this->manager->deleteuploadedfile(getuploaddir()."/".preg_replace("#/uploads/#","",$this->content))){
-                return $this->manager->conn->delete_uploads_entry($this->id);
-            }else{
-                return null;
-            }
+            return $this->manager->deleteuploadedfile(getuploaddir()."/".preg_replace("#/uploads/#","",$this->content));
         }
         function render(){
             ?>
@@ -168,7 +164,13 @@
         function removefile($id){
             $file = $this->getupload($id);
             if($file){
-                $file->remove();
+                if($file->remove()){
+                    return $this->conn->delete_uploads_entry($this->id);
+                }else{
+                    return null;
+                }
+            }else{
+                return null;
             }
         }
 
