@@ -1,5 +1,32 @@
 <?php
 
+    class TekMedia{
+        private $rawdata;
+        public $id;
+        public $type;
+        public $media;
+        public $options;
+        function assign(){
+            if(is_array($this->rawdata)){
+                if($this->rawdata['id']){
+                    $this->id = $this->rawdata['id'];
+                }
+                if($this->rawdata['type']){
+                    $this->type = $this->rawdata['type'];
+                }
+                if($this->rawdata['content']){
+                    $this->content = $this->rawdata['content'];
+                }
+                if($this->rawdata['options']){
+                    $this->options = $this->rawdata['options'];
+                }
+            }
+        }
+        function __construct($raw){
+            $this->rawdata = $raw;
+        }
+    }
+
     class TekMediaManager{
         private $selfdir;
         private $uploaddir;
@@ -24,7 +51,9 @@
         }
 
         function getuploads(){
-            return $this->conn->select_uploads_entries();
+            return array_map(function ($raw){
+                return new TekMedia($raw);
+            },$this->conn->select_uploads_entries());
         }
 
         function registerfile($type,$content,$options=""){
@@ -35,8 +64,8 @@
 
         }
 
-        function getfile($id){
-            return $this->conn->select_file_entry($id);
+        function getupload($id){
+            return new TekMedia($this->conn->select_file_entry($id));
         }
 
         function __construct($crud){
