@@ -240,8 +240,6 @@
             if($tmaction == 'doreplace' ){
                 $this->updateupload($content,$type,$id);
             }
-
-
         }
 
         function newupload($content,$type){
