@@ -12,7 +12,11 @@
             $filescount = count($content['name']);
             if($filescount){
                 for($i = 0 ; $i < $filescount ; $i++){
-                    
+                    $filetype = $content['type'][$i]; 
+                    $filename = $content['name'][$i];
+                    $fileerror= $content['error'][$i];
+                    $filesize = $content['size'][$i];
+                    $tmpname  = $content['tmp_name'][$i];
                 }
             }else{
                 echo "error: no file to upload";
