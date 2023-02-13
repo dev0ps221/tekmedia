@@ -19,13 +19,11 @@
                         if($this->type=='image'){
                             ?>
                                 <img src="<?php echo $this->media ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
-
                             <?php
                         }
                         if($this->type=='video'){
                             ?>
                                 <video src="<?php echo $this->media ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
-
                             <?php
                         }
 
@@ -76,7 +74,38 @@
                     }
                     
                 </style>
-
+                <section id="tmmanager">
+                    <div id="views">
+                        <div id="tmtypestab">
+                            <?php
+                                foreach($this->manager->getallowedtypes() as $type){
+                                    ?>  
+                                        <div class="tmtab">
+                                            <?php echo $type ?>
+                                        </div>
+                                    <?php
+                                }
+                            ?>  
+                        </div>
+                        <?php
+                            $this->render('uploadlist');
+                        ?>
+                    </div>
+                    <section id="tmactions">
+                        <div id="uploadaction">
+                            <h2>
+                                TELEVERSER UN MEDIA
+                            </h2>
+                            <?php
+                                $this->manager->render('uploadform')
+                            ?>
+                        </div>
+                        <div id="replaceaction">
+    
+                        </div>
+    
+                    </section>
+                </section>
 
 
 
@@ -202,7 +231,7 @@
             }
         }
 
-        function render($rendername,$args){
+        function render($rendername,$args=[]){
             if(method_exists($this,$rendername)){
                 return $this->{$rendername}(...$args);
             }
@@ -222,6 +251,10 @@
         
         function getuploaddir(){
             return $this->uploaddir;
+        }
+        
+        function getallowedtypes(){
+            return $this->allowedtypes;
         }
 
         function uploadfile($type,$target,$tmpname){

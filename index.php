@@ -1,7 +1,7 @@
 <?php
     include_once('tekmedia.php');
     $tm = new TekMediaManager();
-    if($_POST['tmaction']){
+    if(isset($_POST['tmaction'])){
         $tm->ajaxrequest();
     }else{
         $tm->render('manager');
