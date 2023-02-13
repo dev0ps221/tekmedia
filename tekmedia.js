@@ -8,6 +8,7 @@ function refreshuploadlist(){
     req.onload = function (event){
         if(document.querySelector('#tmuploads')){
             document.querySelector('#tmuploads').innerHTML = req.responseText
+            initEvents()
         }
     }
     req.send(formdata)
@@ -30,19 +31,24 @@ function initupload(e,form){
     req.send(formdata)
 }
 
-function manager_select_elem(elem){
-    console.log(elem.id+" is the selected media id")
+function manager_select_elem(elem,actionsbox){
+
+    const replacebox = actionsbox.querySelector('#replaceaction')
     request_tmrender('replaceform',elem.id,updateformraw=>{
-        console.log(updateformraw)
+        replacebox.innerHTML = updateformraw
     })
 }
 
-function manager_select_media_events(elems){
+function manager_select_media_events(elems,replacebox,actionsbox,viewsbox){
     elems.forEach(
-        elem=>
-            elem.addEventListener(
-                'click',e=>manager_select_elem(elem)
+        elem=>{
+            elem.removeEventListener(
+                'click',e=>manager_select_elem(elem,actionsbox)
             )
+            elem.addEventListener(
+                'click',e=>manager_select_elem(elem,actionsbox)
+            )
+        }
     )
 }
 
@@ -54,7 +60,7 @@ function initEvents(){
         if(actionsbox && viewsbox){
             const replacebox = actionsbox.querySelector('#replaceaction') 
             const tekmedias  = viewsbox.querySelectorAll('.tekmedia')
-            manager_select_media_events(tekmedias)
+            manager_select_media_events(tekmedias,replacebox,actionsbox,viewsbox)
         }
 
     }
@@ -72,5 +78,6 @@ function request_tmrender(render,args=[],cb){
             cb(req.responseText)
         }
     }
+    req.send(formdata)
 }
 initEvents()

@@ -18,12 +18,12 @@
                     <?php
                         if($this->type=='image'){
                             ?>
-                                <img src="<?php echo $this->media ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
+                                <img src="<?php echo $this->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
                             <?php
                         }
                         if($this->type=='video'){
                             ?>
-                                <video src="<?php echo $this->media ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
+                                <video src="<?php echo $this->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
                             <?php
                         }
 
@@ -176,6 +176,26 @@
                 ?> <h2> VOUS ESSAYEZ D'ACCEDER A UNE RESSOURCE NON AUTORISEE ! </h2> <?php
             }
         }
+        
+        function deleteform($id,$ajaxpath=''){
+            $upload = $this->manager->getupload($id);
+            if($upload){
+                ?>
+                    <form method="post" onsubmit='initupload(event,event.currentTarget)'>
+                        <div class="field">
+                            <input type="hidden" name="tmaction" value='dodelete'>
+                            <input type="hidden" name="id" value='<?php echo $upload->id ?>'>
+                            <button>
+                                supprimer
+                            </button>
+                        </div>
+                    </form>
+                
+                <?php
+            }else{
+                ?> <h2> VOUS ESSAYEZ D'ACCEDER A UNE RESSOURCE NON AUTORISEE ! </h2> <?php
+            }
+        }
 
         function render($rendername,$args=[]){
             if(method_exists($this,$rendername)){
@@ -263,11 +283,13 @@
                 $this->updateupload($content,$type,$id);
             }
             if($tmaction == 'getrender' ){
-                $this->render($render,...(json_decode($args)));
+                $args = [json_decode($args)];
+                $this->render($render,...$args);
             }
         }
 
         function newupload($content,$type){
+            sleep(1);
             $filescount = count($content['name']);
             if($filescount){
                 for($i = 0 ; $i < $filescount ; $i++){
@@ -365,5 +387,4 @@
             $this->initdb();
         }
     }
-
 ?>
