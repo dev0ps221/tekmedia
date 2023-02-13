@@ -5,10 +5,11 @@
         private $uploaddir;
         private $uploadtable = "uploads";
 
-        function uploadfile($type,$target,$image){
+        function uploadfile($type,$target,$tmpname){
             $uploaddir = $this->uploaddir."/".$target;
-            if(move_uploaded_file($image['tmp_name'],$uploaddir)){
-                return $target;
+            $targetdir = "/uploads/".$target;
+            if(move_uploaded_file($tmpname,$uploaddir)){
+                return $targetdir;
             }else{
                 return false;
             }
@@ -27,10 +28,11 @@
         }
 
         function registerfile($type,$content,$options=""){
-
+            return $this->conn->insert_into_uploads(['type'=>$type,'content'=>$content,'options'=>$options]);
         }
 
         function __construct($crud){
+            $this->uploaddir = dirname(__FILE__)."/uploads";
             $this->conn = $crud; 
         }
     }

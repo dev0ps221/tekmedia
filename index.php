@@ -10,13 +10,31 @@
         print_r($tm->getuploads());
         if($action == 'doupload' ){
             $filescount = count($content['name']);
+            $allowedtypes = ['image','video']; 
             if($filescount){
                 for($i = 0 ; $i < $filescount ; $i++){
-                    $filetype = $content['type'][$i]; 
+                    print_r($content);
+                    $filesize = $content['size'][$i]; 
                     $filename = $content['name'][$i];
-                    $fileerror= $content['error'][$i];
-                    $filesize = $content['size'][$i];
+                    $fileerror= count($content['error']) >= $i ? $content['error'][$i] : null; 
+                    $filetype = explode("/",$content['type'][$i])[0];
+                    $fileext  = explode("/",$content['type'][$i])[1];
                     $tmpname  = $content['tmp_name'][$i];
+                    if(!$fileerror and $type == $filetype and in_array($filetype,$allowedtypes)){
+                        echo "we can upload";
+                        $upladpath = $tm->uploadfile($type,"".time().".$fileext",$tmpname);
+                        if($upladpath){
+                            if($tm->registerfile($type,$upladpath,isset($options)?$options:'')){
+                                echo "success uploading";
+                            }else{
+                                echo "error: failed registering $uploadpath";
+                            }
+                        }else{
+                            echo "error: failed uploading $filename";
+                        }
+                    }else{
+                        echo "error: type $type  doesnt match the filetype ". $filetype;
+                    }
                 }
             }else{
                 echo "error: no file to upload";
@@ -28,7 +46,7 @@
                 <div class="field">
                     <label for="type">type</label>
                     <select name="type" id="type" class="entry">
-                        <option value="photo">photo</option>
+                        <option value="image">image</option>
                         <option value="video">video</option>
                     </select>
                 </div>
