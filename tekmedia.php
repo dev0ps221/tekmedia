@@ -7,7 +7,10 @@
         public $media;
         public $options;
         function remove(){
-            return $this->manager->deleteuploadedfile(getuploaddir()."/".preg_replace("#/uploads/#","",$this->content));
+            return $this->manager->deleteuploadedfile($this->manager->getuploaddir()."/".str_replace("/uploads/","",$this->media));
+        }
+        function replace($tmpname){
+            return  $this->manager->uploadfile($this->type,$this->manager->getuploaddir()."/".str_replace("/uploads/","",$this->media),$tmpname);
         }
         function render(){
             ?>
@@ -49,6 +52,7 @@
         }
         function __construct($raw,$manager){
             $this->rawdata = $raw;
+            $this->manager = $manager;
             $this->assign();
         }
     }
@@ -111,6 +115,51 @@
             <?php
         }
 
+        function replaceform($id,$ajaxpath=''){
+            $upload = $this->getupload($id);
+            if($upload){
+                ?>
+                    <form enctype='multipart/formdata' method="post" onsubmit='initupload(event,event.currentTarget)'>
+                        <div class="field">
+                            <label for="type">type</label>
+                            <select name="type" id="type" class="entry">
+                                <option value="image">image</option>
+                                <option value="video">video</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="content">
+                                uploader le media
+                            </label>
+                            <input type="file" id='content' name='content[]' multiple>
+                        </div>
+                        <div class="field">
+                            <input type="hidden" name="tmaction" value='doupload'>
+                            <input type="hidden" name="tmaction" value='doupload'>
+                            <input type="hidden" name="tmaction" value='doupload'>
+                            <button>
+                                uploader
+                            </button>
+                        </div>
+                    </form>
+                    <script>
+                        function initupload(e,form){
+                            e.preventDefault()
+                            const formdata = new FormData(form)
+                            const req = new XMLHttpRequest()
+                            req.open('post',`<?php echo $ajaxpath?>`);
+                            req.onload = function (event){
+                                console.log(req.response)
+                            }
+                            req.send(formdata)
+                        }
+                    </script>
+                <?php
+            }else{
+                ?> <h2> VOUS ESSAYEZ D'ACCEDER A UNE RESSOURCE NON AUTORISEE ! </h2> <?php
+            }
+        }
+
         function render($rendername){
             if(method_exists($this,$rendername)){
                 return $this->{$rendername}();
@@ -165,7 +214,7 @@
             $file = $this->getupload($id);
             if($file){
                 if($file->remove()){
-                    return $this->conn->delete_uploads_entry($this->id);
+                    return $this->conn->delete_uploads_entry($file->id);
                 }else{
                     return null;
                 }
@@ -175,7 +224,12 @@
         }
 
         function getupload($id){
-            return new TekMedia($this->conn->select_file_entry($id),$this);
+            $raw = $this->conn->select_uploads_entry($id);
+            if($raw and is_array($raw[0])){
+                return new TekMedia($raw[0],$this);
+            }else{
+                return null;
+            }
         }
 
         function ajaxrequest(){
