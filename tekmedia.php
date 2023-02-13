@@ -10,7 +10,7 @@
             return $this->manager->deleteuploadedfile($this->manager->getuploaddir()."/".str_replace("/uploads/","",$this->media));
         }
         function replace($tmpname){
-            return  $this->manager->uploadfile($this->type,$this->manager->getuploaddir()."/".str_replace("/uploads/","",$this->media),$tmpname);
+            return  $this->manager->uploadfile($this->type,str_replace("/uploads/","",$this->media),$tmpname);
         }
         function render(){
             ?>
@@ -116,7 +116,7 @@
         }
 
         function replaceform($id,$ajaxpath=''){
-            $upload = $this->getupload($id);
+            $upload = $this->manager->getupload($id);
             if($upload){
                 ?>
                     <form enctype='multipart/formdata' method="post" onsubmit='initupload(event,event.currentTarget)'>
@@ -134,9 +134,8 @@
                             <input type="file" id='content' name='content[]' multiple>
                         </div>
                         <div class="field">
-                            <input type="hidden" name="tmaction" value='doupload'>
-                            <input type="hidden" name="tmaction" value='doupload'>
-                            <input type="hidden" name="tmaction" value='doupload'>
+                            <input type="hidden" name="tmaction" value='doreplace'>
+                            <input type="hidden" name="id" value='<?php echo $upload->id ?>'>
                             <button>
                                 uploader
                             </button>
@@ -160,9 +159,9 @@
             }
         }
 
-        function render($rendername){
+        function render($rendername,$args){
             if(method_exists($this,$rendername)){
-                return $this->{$rendername}();
+                return $this->{$rendername}(...$args);
             }
         }
 
@@ -238,6 +237,9 @@
             if($tmaction == 'doupload' ){
                 $this->newupload($content,$type);
             }
+            if($tmaction == 'doreplace' ){
+                $this->updateupload($content,$type,$id);
+            }
 
 
         }
@@ -246,7 +248,6 @@
             $filescount = count($content['name']);
             if($filescount){
                 for($i = 0 ; $i < $filescount ; $i++){
-                    print_r($content);
                     $filesize = $content['size'][$i]; 
                     $filename = $content['name'][$i];
                     $fileerror= count($content['error']) >= $i ? $content['error'][$i] : null; 
@@ -274,6 +275,33 @@
             }
         }
 
+
+        function updateupload($content,$type,$id){
+            $filescount = count($content['name']);
+            if($filescount){
+                for($i = 0 ; $i < $filescount ; $i++){
+                    $filesize = $content['size'][$i]; 
+                    $filename = $content['name'][$i];
+                    $fileerror= count($content['error']) >= $i ? $content['error'][$i] : null; 
+                    $filetype = explode("/",$content['type'][$i])[0];
+                    $fileext  = explode("/",$content['type'][$i])[1];
+                    $tmpname  = $content['tmp_name'][$i];
+                    if(!$fileerror and $type == $filetype and in_array($filetype,$this->allowedtypes)){
+                        $upload = $this->getupload($id);
+                        if($upload and $upload->replace($tmpname)){
+                            echo "success uploading";
+                        }else{
+                            echo "error: failed uploading $filename";
+                        }
+                    }else{
+                        echo "error: type $type  doesnt match the filetype ". $filetype;
+                    }
+                }
+            }else{
+                echo "error: no file to upload";
+            }
+        }
+
         function setDbInfo($infoname,$infoval,$reconnect=false){
             $this->conn->{$infoname} = $infoval;
             if($reconnect){
@@ -281,19 +309,37 @@
             }
         }
 
-        function render($rendername){
-            $this->renders->render($rendername);
+        function render($rendername,...$args){
+            $this->renders->render($rendername,$args);
+        }
+
+        function initdb(){
+            if($this->conn == null){
+                include_once('crudconnection.php');
+                $this->conn = new CrudConnection(
+                    null,       //dbhost
+                    'root',     //dbuser
+                    null,       //dbpassword
+                    'tester'    //dbname
+                );
+                $this->conn->__connect();
+            }
+            $match = null;
+            foreach($this->conn->getdatabasetables() as $table){
+                if($table['name']== $this->uploadtable) $match = 1;
+            }
+            if(!$match){
+                $this->conn->query(
+                    "create table ".$this->uploadtable." (id int not null auto_increment primary key,type text not null, content text not null,options text null);"
+                );
+            }
         }
 
         function __construct($crud = null){
             $this->uploaddir = dirname(__FILE__)."/uploads";
             $this->conn = $crud; 
             $this->renders = new TekMediaRenders($this);
-            if($this->conn == null){
-                include_once('crudconnection.php');
-                $this->conn = new CrudConnection(null,'root',null,$dbname='tekmedia');
-                $this->conn->__connect();
-            }
+            $this->initdb();
         }
     }
 

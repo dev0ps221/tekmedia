@@ -259,7 +259,7 @@ class CrudConnection{
         }
     }
 
-    function __construct($dbhost='',$dbuser='root',$dbpass='',$dbname='samashop_complet'){
+    function __construct($dbhost='',$dbuser='root',$dbpass='',$dbname='tekmedia'){
         $this->dbhost = $dbhost;
         $this->dbuser = $dbuser;
         $this->dbpass = $dbpass;
