@@ -15,7 +15,7 @@
             <body>
                 <link rel="stylesheet" href="/tekmedia.css">
                 <?php
-                $tm->render('manager');
+                $tm->render('selectbox');
                 ?>
                 <script src="/tekmedia.js"></script>
             </body>

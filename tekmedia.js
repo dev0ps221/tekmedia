@@ -26,6 +26,24 @@ function initupload(e,form){
             if(uploadlist){
                 refreshuploadlist()
             }
+            
+            if(formdata.has('id')){
+                const actionsbox = document.querySelector("#tmactions")
+                if(actionsbox){
+                    const replacebox = actionsbox.querySelector('#replaceaction')
+                    const deletebox = actionsbox.querySelector('#deleteaction')
+                    request_tmrender('replaceform',formdata.get('id'),updateformraw=>{
+                        replacebox.innerHTML = updateformraw
+                    })
+                    request_tmrender('deleteform',formdata.get('id'),deleteformraw=>{
+                        deletebox.innerHTML = deleteformraw
+                    })
+                }
+
+            }
+
+        }else{
+            alert(req.response)
         }
     }
     req.send(formdata)

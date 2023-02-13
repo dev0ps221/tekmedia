@@ -14,7 +14,10 @@
         }
         function render(){
             ?>
-                <div class="tekmedia" id='<?php echo $this->id; ?>'>
+                <figure class="tekmedia" id='<?php echo $this->id; ?>'>
+                    <figcaption>
+                        upload N<?php echo $this->id?>
+                    </figcaption>
                     <?php
                         if($this->type=='image'){
                             ?>
@@ -23,12 +26,12 @@
                         }
                         if($this->type=='video'){
                             ?>
-                                <video src="<?php echo $this->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
+                                <video controls src="<?php echo $this->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$this->id ?>"></video>
                             <?php
                         }
 
                     ?>
-                </div>
+                </figure>
 
             <?php
         }
@@ -57,10 +60,8 @@
 
     class TekMediaRenders{
         
-        function manager($ajaxpath = ""){
+        function manager(){
             $uploads = $this->manager->getuploads();
-            $firstidx = 0;
-            
             ?>
                 <section id="tmmanager">
                     <div id="tmviews">
@@ -91,13 +92,15 @@
                                 $this->manager->render('uploadform')
                             ?>
                         </div>
+                        <h3>
+                            GERER LE MEDIA
+                        </h3>
                         <div id="replaceaction">
     
                         </div>
                         <div id="deleteaction">
     
                         </div>
-    
                     </section>
                 </section>
 
@@ -105,6 +108,34 @@
 
 
             <?php
+        }
+
+        function selectbox(){
+            $uploads = $this->manager->getuploads();
+                ?>
+                <section id="tmselectbox">
+                    <?php
+                        $this->render('uploadlist');
+                    ?>
+                    </div>
+                    <section id="tmactions">
+                        <h3>
+                            MEDIAS SELECTIONNEES
+                        </h3>
+                        <div class="preview">
+
+                        </div>
+                        <div id="selectaction">
+    
+                        </div>
+                    </section>
+                </section>
+
+
+
+
+            <?php
+
         }
 
         function uploadlist($ajaxpath = ""){
@@ -161,6 +192,21 @@
                                 <option value="image">image</option>
                                 <option value="video">video</option>
                             </select>
+                        </div>
+                        <div class="preview">
+                            <?php
+                                if($upload->type=='image'){
+                                    ?>
+                                        <img src="<?php echo $upload->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$upload->id ?>">
+                                    <?php
+                                }
+                                if($upload->type=='video'){
+                                    ?>
+                                        <video controls src="<?php echo $upload->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$upload->id ?>"></video>
+                                    <?php
+                                }
+
+                            ?>
                         </div>
                         <div class="field">
                             <label for="content">
@@ -305,7 +351,7 @@
                     $filename = $content['name'][$i];
                     $fileerror= count($content['error']) >= $i ? $content['error'][$i] : null; 
                     $filetype = explode("/",$content['type'][$i])[0];
-                    $fileext  = explode("/",$content['type'][$i])[1];
+                    $fileext  = str_replace('x-matroska','mp4',explode("/",$content['type'][$i])[1]);
                     $tmpname  = $content['tmp_name'][$i];
                     if(!$fileerror and $type == $filetype and in_array($filetype,$this->allowedtypes)){
                         $target = "".time().".$fileext";

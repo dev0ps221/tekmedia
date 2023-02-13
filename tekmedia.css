@@ -1,4 +1,4 @@
-#tmmanager{
+#tmmanager,#tmselectbox{
     display:grid;
     grid-template-columns:8fr 4fr;
     grid-template-rows:1fr 5fr;
@@ -27,7 +27,23 @@
     overflow-y: scroll;
     max-height: 80vh;
 }
-#tmmanager img{
+#tmmanager img,#tmselectbox img{
     width: 100%;
     height: 160px;
+}
+#tmmanager video,#tmselectbox video{
+    width: 100%;
+    height: 160px;
+}
+#tmmanager figure{
+    background: #333;
+    text-align: center;
+    color:#ddd;
+    cursor: pointer;
+    border-top-left-radius: .8em;
+    border-top-right-radius: .8em;
+}
+#tmmanager figcaption{
+    padding: 2%;
+    border-radius: 5em;
 }
