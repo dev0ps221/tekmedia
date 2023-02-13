@@ -62,18 +62,6 @@
             $firstidx = 0;
             
             ?>
-                <style>
-                    #tmmanager{
-                        display:grid;
-                        grid-template-columns:8fr 4fr;
-                        grid-template-rows:1fr 5fr;
-                    }
-                    #tmtypestab{
-                        display:flex;
-                        justify-content:flex-start;
-                    }
-                    
-                </style>
                 <section id="tmmanager">
                     <div id="views">
                         <div id="tmtypestab">
@@ -115,10 +103,9 @@
 
         function uploadlist($ajaxpath = ""){
             ?>
+
                 <section id="tmuploads">
-                    <h2>
-                        uploads
-                    </h2>
+           
                     <section class="liste_uploads">
                         <?php
                             foreach($this->manager->getuploads() as $tekmedia){
@@ -127,23 +114,9 @@
                         ?>
                     </section>
                 </section>
-                <script>
-                    function refreshuploadlist(){
-                        const formdata = new FormData()
-                        formdata.append('tmaction','getrender')
-                        formdata.append('render','uploadlist')
-                        const req = new XMLHttpRequest()
-                        req.open('post',`<?php echo $ajaxpath?>`);
-                        req.onload = function (event){
-                            document.querySelector('#tmuploads').innerHTML = req.responseText
-                        }
-                        req.send(formdata)
-
-                    }
-                </script>
-            <?php
+         <?php
+        
         }
-
         function uploadform($ajaxpath=''){
             ?>
                 <form enctype='multipart/formdata' method="post" onsubmit='initupload(event,event.currentTarget)'>
@@ -167,24 +140,8 @@
                         </button>
                     </div>
                 </form>
-                <script>
-                    function initupload(e,form){
-                        e.preventDefault()
-                        const formdata = new FormData(form)
-                        const req = new XMLHttpRequest()
-                        req.open('post',`<?php echo $ajaxpath?>`);
-                        req.onload = function (event){
-                            if(req.response.match('success')){
-                                const uploadlist = document.querySelector("#tmuploads")
-                                if(uploadlist){
-                                    refreshuploadlist()
-                                }
-                            }
-                        }
-                        req.send(formdata)
-                    }
-                </script>
-            <?php
+           
+           <?php
         }
 
         function replaceform($id,$ajaxpath=''){
@@ -213,18 +170,7 @@
                             </button>
                         </div>
                     </form>
-                    <script>
-                        function initupload(e,form){
-                            e.preventDefault()
-                            const formdata = new FormData(form)
-                            const req = new XMLHttpRequest()
-                            req.open('post',`<?php echo $ajaxpath?>`);
-                            req.onload = function (event){
-                                console.log(req.response)
-                            }
-                            req.send(formdata)
-                        }
-                    </script>
+                
                 <?php
             }else{
                 ?> <h2> VOUS ESSAYEZ D'ACCEDER A UNE RESSOURCE NON AUTORISEE ! </h2> <?php

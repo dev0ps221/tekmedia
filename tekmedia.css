@@ -1,0 +1,20 @@
+#tmmanager{
+    display:grid;
+    grid-template-columns:8fr 4fr;
+    grid-template-rows:1fr 5fr;
+}
+#tmtypestab{
+    display:flex;
+    justify-content:flex-start;
+}
+#tmuploads .liste_uploads{
+    display: grid;
+    grid-template-columns: repeat(6,3fr);
+    grid-gap:.2em;
+    grid-row:.2em;
+    overflow-y: scroll;
+    max-height: 80vh;
+}
+.tekmedia img{
+    width: 100%;
+}
