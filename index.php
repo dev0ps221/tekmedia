@@ -1,5 +1,5 @@
 <?php
-    include_once('tekmedia.php');
+    include_once('tm/tekmedia.php');
     $tm = new TekMediaManager();
     if(isset($_POST['tmaction'])){
         $tm->ajaxrequest();
@@ -20,6 +20,7 @@
                 <script src="/tekmedia.js"></script>
             </body>
             </html>
-    <?php }
+        <?php 
+    }
 ?>
     
