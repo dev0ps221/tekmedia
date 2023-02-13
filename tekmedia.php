@@ -1,13 +1,14 @@
 <?php
 
     class TekMedia{
+        private $prefix;
         private $rawdata;
         public $id;
         public $type;
         public $media;
         public $options;
         function remove(){
-            return $this->manager->deleteuploadedfile($this->manager->getuploaddir()."/".str_replace("/uploads/","",$this->media));
+            return $this->manager->deleteuploadedfile($this->manager->getuploaddir()."/".str_replace($this->manager->prefix."/uploads/","",$this->media));
         }
         function replace($tmpname){
             return  $this->manager->uploadfile($this->type,str_replace("/uploads/","",$this->media),$tmpname);
@@ -306,7 +307,7 @@
 
         function uploadfile($type,$target,$tmpname){
             $uploaddir = $this->uploaddir."/".$target;
-            $targetdir = "/uploads/".$target;
+            $targetdir = $this->prefix."/uploads/".$target;
             if(move_uploaded_file($tmpname,$uploaddir)){
                 return $targetdir;
             }else{
@@ -315,9 +316,10 @@
         }
 
         function deleteuploadedfile($filepath){
-            if(unlink($filepath)){
+            try{
+                unlink($filepath);
                 return true;
-            }else{
+            }catch(Exception $e){
                 return null;
             }
         }
@@ -336,7 +338,12 @@
             $file = $this->getupload($id);
             if($file){
                 if($file->remove()){
-                    return $this->conn->delete_uploads_entry($file->id);
+                    try{
+                        $this->conn->delete_uploads_entry($file->id);
+                        return true;
+                    }catch(Exception $e){
+                        return null;
+                    }
                 }else{
                     return null;
                 }
@@ -470,8 +477,14 @@
         function __construct($crud = null){
             $this->uploaddir = dirname(__FILE__)."/uploads";
             $this->conn = $crud; 
+            $this->prefix  = str_replace(str_replace($_SERVER['SCRIPT_NAME'],'',$_SERVER['SCRIPT_FILENAME']),'',dirname(__FILE__));
             $this->renders = new TekMediaRenders($this);
             $this->initdb();
+                // <script>
+                //     const tmprefix = `<?php// echo $this->prefix `
+                // </script> 
+            ?>
+            <?php
         }
     }
 ?>

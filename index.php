@@ -1,5 +1,5 @@
 <?php
-    include_once('tm/tekmedia.php');
+    include_once('tekmedia.php');
     $tm = new TekMediaManager();
     if(isset($_POST['tmaction'])){
         $tm->ajaxrequest();
@@ -15,7 +15,7 @@
             <body>
                 <link rel="stylesheet" href="/tekmedia.css">
                 <?php
-                $tm->render('selectbox');
+                $tm->render('manager');
                 ?>
                 <script src="/tekmedia.js"></script>
             </body>

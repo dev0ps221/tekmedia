@@ -31,7 +31,7 @@ function initupload(e,form){
                 refreshuploadlist()
             }
             
-            if(formdata.has('id')){
+            if(formdata.has('id') && formdata.get('tmaction') != 'dodelete'){
                 const actionsbox = document.querySelector("#tmactions")
                 if(actionsbox){
                     const replacebox = actionsbox.querySelector('#replaceaction')
@@ -44,6 +44,11 @@ function initupload(e,form){
                     })
                 }
 
+            }
+            if(formdata.has('id') && formdata.get('tmaction')=='dodelete'){
+                if(document.querySelector('#tmactions .preview')){
+                    document.querySelector('#tmactions .preview').innerHTML = ""
+                }
             }
 
         }else{
