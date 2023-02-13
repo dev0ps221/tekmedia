@@ -22,6 +22,10 @@
             }
         }
 
+        function getuploads(){
+            return $this->conn->select_uploads_entries();
+        }
+
         function registerfile($type,$content,$options=""){
 
         }
