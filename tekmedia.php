@@ -65,6 +65,9 @@
                 <section id="tmmanager">
                     <div id="tmviews">
                         <div id="tmtypestab">
+                            <div class="tmtab selected">
+                                mix
+                            </div>
                             <?php
                                 foreach($this->manager->getallowedtypes() as $type){
                                     ?>  
@@ -89,6 +92,9 @@
                             ?>
                         </div>
                         <div id="replaceaction">
+    
+                        </div>
+                        <div id="deleteaction">
     
                         </div>
     
@@ -292,7 +298,6 @@
         }
 
         function newupload($content,$type){
-            sleep(1);
             $filescount = count($content['name']);
             if($filescount){
                 for($i = 0 ; $i < $filescount ; $i++){
@@ -303,8 +308,12 @@
                     $fileext  = explode("/",$content['type'][$i])[1];
                     $tmpname  = $content['tmp_name'][$i];
                     if(!$fileerror and $type == $filetype and in_array($filetype,$this->allowedtypes)){
-                        echo "we can upload";
-                        $upladpath = $this->uploadfile($type,"".time().".$fileext",$tmpname);
+                        $target = "".time().".$fileext";
+                        while(file_exists($this->uploaddir."/".$target)){
+                            sleep(1);
+                            $target = "".time().".$fileext";
+                        }
+                        $upladpath = $this->uploadfile($type,$target,$tmpname);
                         if($upladpath){
                             if($this->registerfile($type,$upladpath,isset($options)?$options:'')){
                                 echo "success uploading";

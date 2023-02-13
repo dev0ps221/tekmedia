@@ -34,8 +34,12 @@ function initupload(e,form){
 function manager_select_elem(elem,actionsbox){
 
     const replacebox = actionsbox.querySelector('#replaceaction')
+    const deletebox = actionsbox.querySelector('#deleteaction')
     request_tmrender('replaceform',elem.id,updateformraw=>{
         replacebox.innerHTML = updateformraw
+    })
+    request_tmrender('deleteform',elem.id,deleteformraw=>{
+        deletebox.innerHTML = deleteformraw
     })
 }
 
