@@ -6,6 +6,13 @@
         public $type;
         public $media;
         public $options;
+        function remove(){
+            if($this->manager->deleteuploadedfile(getuploaddir()."/".preg_replace("#/uploads/#","",$this->content))){
+                return $this->manager->conn->delete_uploads_entry($this->id);
+            }else{
+                return null;
+            }
+        }
         function render(){
             ?>
                 <div class="tekmedia" id='<?php echo $this->id; ?>'>
@@ -44,7 +51,7 @@
                 }
             }
         }
-        function __construct($raw){
+        function __construct($raw,$manager){
             $this->rawdata = $raw;
             $this->assign();
         }
@@ -125,6 +132,11 @@
         private $uploaddir;
         private $uploadtable = "uploads";
         private $allowedtypes = ['image','video']; 
+        
+        function getuploaddir(){
+            return $this->uploaddir;
+        }
+
         function uploadfile($type,$target,$tmpname){
             $uploaddir = $this->uploaddir."/".$target;
             $targetdir = "/uploads/".$target;
@@ -139,13 +151,13 @@
             if(unlink($filepath)){
                 return true;
             }else{
-                return $filepath;
+                return null;
             }
         }
 
         function getuploads(){
             return array_map(function ($raw){
-                return new TekMedia($raw);
+                return new TekMedia($raw,$this);
             },$this->conn->select_uploads_entries());
         }
 
@@ -154,11 +166,14 @@
         }
 
         function removefile($id){
-
+            $file = $this->getupload($id);
+            if($file){
+                $file->remove();
+            }
         }
 
         function getupload($id){
-            return new TekMedia($this->conn->select_file_entry($id));
+            return new TekMedia($this->conn->select_file_entry($id),$this);
         }
 
         function ajaxrequest(){
