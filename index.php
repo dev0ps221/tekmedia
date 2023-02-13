@@ -4,6 +4,6 @@
     if($_POST['tmaction']){
         $tm->ajaxrequest();
     }else{
-        $tm->render('replaceform',6);
+        $tm->render('manager');
     }
 ?>

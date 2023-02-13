@@ -59,7 +59,32 @@
 
     class TekMediaRenders{
         
-        function uploadlist(){
+        function manager($ajaxpath = ""){
+            $uploads = $this->manager->getuploads();
+            $firstidx = 0;
+            
+            ?>
+                <style>
+                    #tmmanager{
+                        display:grid;
+                        grid-template-columns:8fr 4fr;
+                        grid-template-rows:1fr 5fr;
+                    }
+                    #tmtypestab{
+                        display:flex;
+                        justify-content:flex-start;
+                    }
+                    
+                </style>
+
+
+
+
+
+            <?php
+        }
+
+        function uploadlist($ajaxpath = ""){
             ?>
                 <section id="tmuploads">
                     <h2>
@@ -73,7 +98,20 @@
                         ?>
                     </section>
                 </section>
+                <script>
+                    function refreshuploadlist(){
+                        const formdata = new FormData()
+                        formdata.append('tmaction','getrender')
+                        formdata.append('render','uploadlist')
+                        const req = new XMLHttpRequest()
+                        req.open('post',`<?php echo $ajaxpath?>`);
+                        req.onload = function (event){
+                            document.querySelector('#tmuploads').innerHTML = req.responseText
+                        }
+                        req.send(formdata)
 
+                    }
+                </script>
             <?php
         }
 
@@ -107,7 +145,12 @@
                         const req = new XMLHttpRequest()
                         req.open('post',`<?php echo $ajaxpath?>`);
                         req.onload = function (event){
-                            console.log(req.response)
+                            if(req.response.match('success')){
+                                const uploadlist = document.querySelector("#tmuploads")
+                                if(uploadlist){
+                                    refreshuploadlist()
+                                }
+                            }
                         }
                         req.send(formdata)
                     }
@@ -239,6 +282,9 @@
             }
             if($tmaction == 'doreplace' ){
                 $this->updateupload($content,$type,$id);
+            }
+            if($tmaction == 'getrender' ){
+                $this->render($render);
             }
         }
 
