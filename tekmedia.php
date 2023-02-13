@@ -63,7 +63,7 @@
             
             ?>
                 <section id="tmmanager">
-                    <div id="views">
+                    <div id="tmviews">
                         <div id="tmtypestab">
                             <?php
                                 foreach($this->manager->getallowedtypes() as $type){
@@ -263,7 +263,7 @@
                 $this->updateupload($content,$type,$id);
             }
             if($tmaction == 'getrender' ){
-                $this->render($render);
+                $this->render($render,...(json_decode($args)));
             }
         }
 

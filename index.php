@@ -14,10 +14,10 @@
             </head>
             <body>
                 <link rel="stylesheet" href="/tekmedia.css">
-                <script src="/tekmedia.js"></script>
                 <?php
                 $tm->render('manager');
                 ?>
+                <script src="/tekmedia.js"></script>
             </body>
             </html>
     <?php }
