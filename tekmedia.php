@@ -176,7 +176,7 @@
                 ?> <h2> VOUS ESSAYEZ D'ACCEDER A UNE RESSOURCE NON AUTORISEE ! </h2> <?php
             }
         }
-        
+
         function deleteform($id,$ajaxpath=''){
             $upload = $this->manager->getupload($id);
             if($upload){
@@ -281,6 +281,9 @@
             }
             if($tmaction == 'doreplace' ){
                 $this->updateupload($content,$type,$id);
+            }
+            if($tmaction == 'dodelete' ){
+                echo $this->removefile($id) ? "success" : "failed" ;
             }
             if($tmaction == 'getrender' ){
                 $args = [json_decode($args)];
