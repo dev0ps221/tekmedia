@@ -110,13 +110,42 @@
             <?php
         }
 
+        function preview_elem($id){
+            $upload = $this->manager->getupload($id);
+            if($upload != null){
+                $upload->render();
+            }
+        }
+
+        function select_elem($id,$ajaxpath="xaja.php"){
+            $upload = $this->manager->getupload($id);
+            if($upload){
+                ?>
+                    <form method="post" onsubmit='initupload(event,event.currentTarget)'>
+                        <div class="field">
+                            <input type="hidden" name="apath" value='<?php echo $ajaxpath ; ?>'>
+                            <input type="hidden" name="tmaction" value='tmselectupload'>
+                            <input type="hidden" name="id" value='<?php echo $upload->id ?>'>
+                            <button>
+                                valider la selection
+                            </button>
+                        </div>
+                    </form>
+                
+                <?php
+            }else{
+                ?> <h2> VOUS ESSAYEZ D'ACCEDER A UNE RESSOURCE NON AUTORISEE ! </h2> <?php
+            }
+        }
+
         function selectbox(){
             $uploads = $this->manager->getuploads();
                 ?>
                 <section id="tmselectbox">
-                    <?php
-                        $this->render('uploadlist');
-                    ?>
+                    <div id="tmviews">
+                        <?php
+                            $this->render('uploadlist');
+                        ?>
                     </div>
                     <section id="tmactions">
                         <h3>
