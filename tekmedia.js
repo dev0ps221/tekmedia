@@ -14,6 +14,36 @@ function refreshuploadlist(){
     req.send(formdata)
 
 }
+function refreshvideolist(){
+    const formdata = new FormData()
+    formdata.append('tmaction','getrender')
+    formdata.append('render','videolist')
+    const req = new XMLHttpRequest()
+    req.open('post',`${ajaxpath}`);
+    req.onload = function (event){
+        if(document.querySelector('#tmuploads')){
+            document.querySelector('#tmuploads').innerHTML = req.responseText
+            initEvents()
+        }
+    }
+    req.send(formdata)
+
+}
+function refreshimagelist(){
+    const formdata = new FormData()
+    formdata.append('tmaction','getrender')
+    formdata.append('render','imagelist')
+    const req = new XMLHttpRequest()
+    req.open('post',`${ajaxpath}`);
+    req.onload = function (event){
+        if(document.querySelector('#tmuploads')){
+            document.querySelector('#tmuploads').innerHTML = req.responseText
+            initEvents()
+        }
+    }
+    req.send(formdata)
+
+}
 
 function initupload(e,form){
     e.preventDefault()
@@ -149,3 +179,8 @@ function request_tmrender(render,args=[],cb){
     req.send(formdata)
 }
 initEvents()
+
+const uploadlist = document.querySelector("#tmuploads")
+if(uploadlist){
+    refreshuploadlist()
+}

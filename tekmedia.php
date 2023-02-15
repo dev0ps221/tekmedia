@@ -61,7 +61,16 @@
 
     class TekMediaRenders{
         
-        function manager(){
+        function assets(){
+            ?>
+                <link rel="stylesheet" href="<?php echo $this->manager->prefix ?>/tekmedia.css">
+                <script src="<?php echo $this->manager->prefix ?>/tekmedia.js">
+                </script>
+
+            <?php
+        }
+
+        function manager($actuallist='mix'){
             $uploads = $this->manager->getuploads();
             ?>
                 <section id="tmmanager">
@@ -81,7 +90,7 @@
                             ?>  
                         </div>
                         <?php
-                            $this->render('uploadlist');
+                            $this->render($actuallist == 'mix' ? 'uploadlist' : $actuallist);
                         ?>
                     </div>
                     <section id="tmactions">
@@ -168,14 +177,17 @@
 
         }
 
-        function uploadlist($ajaxpath = ""){
+        function uploadlist(){
             ?>
-
                 <section id="tmuploads">
            
                     <section class="liste_uploads">
                         <?php
-                            foreach($this->manager->getuploads() as $tekmedia){
+                            $uploadlist = $this->manager->getuploads();
+                            if(!$uploadlist){
+                                $uploadlist = $this->manager->getuploads();    
+                            }
+                            foreach($uploadlist as $tekmedia){
                                 $tekmedia->render();
                             }
                         ?>
@@ -184,8 +196,43 @@
          <?php
         
         }
-        function uploadform($ajaxpath=''){
+
+        function videolist(){
             ?>
+
+                <section id="tmuploads">
+           
+                    <section class="liste_uploads">
+                        <?php
+                            foreach($this->manager->getuploads() as $tekmedia){
+                                if($tekmedia->type == 'video') $tekmedia->render();
+                            }
+                        ?>
+                    </section>
+                </section>
+         <?php
+        
+        }
+
+        function imagelist(){
+            ?>
+
+                <section id="tmuploads">
+           
+                    <section class="liste_uploads">
+                        <?php
+                            foreach($this->manager->getuploads() as $tekmedia){
+                                if($tekmedia->type == 'image') $tekmedia->render();
+                            }
+                        ?>
+                    </section>
+                </section>
+         <?php
+        
+        }
+
+        function uploadform(){
+           ?>
                 <form enctype='multipart/formdata' method="post" onsubmit='initupload(event,event.currentTarget)'>
                     <div class="field">
                         <label for="type">type</label>
@@ -211,7 +258,8 @@
            <?php
         }
 
-        function replaceform($id,$ajaxpath=''){
+        function replaceform($id){
+            $ajaxpath = $ajaxpath ? $ajaxpath : $this->manager->prefix;
             $upload = $this->manager->getupload($id);
             if($upload){
                 ?>
@@ -260,6 +308,7 @@
         }
 
         function deleteform($id,$ajaxpath=''){
+            $ajaxpath = $ajaxpath ? $ajaxpath : $this->manager->prefix;
             $upload = $this->manager->getupload($id);
             if($upload){
                 ?>
@@ -374,7 +423,7 @@
                 echo $this->removefile($id) ? "success" : "failed" ;
             }
             if($tmaction == 'getrender' ){
-                $args = [json_decode($args)];
+                $args = [json_decode(isset($args) ? $args : "[]")];
                 $this->render($render,...$args);
             }
         }
