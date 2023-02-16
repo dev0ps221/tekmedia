@@ -1,4 +1,5 @@
-let ajaxpath = `` 
+let ajaxpath = `/core/modules/mediamanager` 
+const acb = []
 function refreshuploadlist(){
     const formdata = new FormData()
     formdata.append('tmaction','getrender')
@@ -8,6 +9,21 @@ function refreshuploadlist(){
     req.onload = function (event){
         if(document.querySelector('#tmuploads')){
             document.querySelector('#tmuploads').innerHTML = req.responseText
+            initEvents()
+        }
+    }
+    req.send(formdata)
+
+}
+function refreshselectlist(){
+    const formdata = new FormData()
+    formdata.append('tmaction','getrender')
+    formdata.append('render','selectbox')
+    const req = new XMLHttpRequest()
+    req.open('post',`${ajaxpath}`);
+    req.onload = function (event){
+        if(document.querySelector('#tmselectbox')){
+            document.querySelector('#tmselectbox').outerHTML = req.responseText
             initEvents()
         }
     }
@@ -24,6 +40,9 @@ function refreshvideolist(){
         if(document.querySelector('#tmuploads')){
             document.querySelector('#tmuploads').innerHTML = req.responseText
             initEvents()
+        }else if(document.querySelector("#tmselectbox")){
+            document.querySelector('#tmselectbox').innerHTML = req.responseText
+            initEvents()
         }
     }
     req.send(formdata)
@@ -39,13 +58,17 @@ function refreshimagelist(){
         if(document.querySelector('#tmuploads')){
             document.querySelector('#tmuploads').innerHTML = req.responseText
             initEvents()
+        }else if(document.querySelector("#tmselectbox")){
+            document.querySelector('#tmselectbox').innerHTML = req.responseText
+            initEvents()
         }
     }
     req.send(formdata)
 
 }
 
-function initupload(e,form){
+
+function sendform(e,form,cb=null){
     e.preventDefault()
     const formdata = new FormData(form)
     
@@ -59,6 +82,10 @@ function initupload(e,form){
             const uploadlist = document.querySelector("#tmuploads")
             if(uploadlist){
                 refreshuploadlist()
+            }
+            const selectlist = document.querySelector("#tmselectbox")
+            if(selectlist){
+                refreshselectlist()
             }
             
             if(formdata.has('id') && formdata.get('tmaction') != 'dodelete'){
@@ -82,8 +109,16 @@ function initupload(e,form){
             }
 
         }else{
-            alert(req.response)
+            console.log(req.response)
         }
+        if(cb && typeof cb != 'undefined'){
+            cb(req)
+        } 
+        acb.forEach(
+            cb=>{
+                cb(req)
+            }
+        )
     }
     req.send(formdata)
 }
@@ -117,11 +152,11 @@ function selectbox_select_elem(elem,actionsbox){
 
     const selectbox = actionsbox.querySelector('#selectaction') 
     const preview = actionsbox.querySelector('.preview') 
-    
-    request_tmrender('select_elem',elem.id,selectelemraw=>{
+    console.log((typeof select_ajaxpath) != 'undefined' ? select_ajaxpath : '', 'is ajaxpath')
+    request_tmrender('select_elem',[elem.id,(((typeof select_ajaxpath) != 'undefined')?select_ajaxpath:null)],selectelemraw=>{
         selectbox.innerHTML = selectelemraw
     })
-    request_tmrender('preview_elem',elem.id,previewelemraw=>{
+    request_tmrender('preview_elem',[elem.id],previewelemraw=>{
         preview.innerHTML = previewelemraw
     })
    
@@ -163,12 +198,16 @@ function initEvents(){
 
     }
 }
-function request_tmrender(render,args=[],cb){
-    args = JSON.stringify(args)
+function request_tmrender(render,args,cb){
+    args = JSON.stringify(Array.isArray(args) ? args : [args])
+
+    console.log(render)
+    console.log('render args ',args)
     const formdata = new FormData()
     formdata.append('tmaction','getrender')
     formdata.append('render',render)
     formdata.append('args',args)
+    console.log('render args ',formdata.get('args'))
     const req = new XMLHttpRequest()
     req.open('post',`${ajaxpath}`);
     req.onload = function (event){

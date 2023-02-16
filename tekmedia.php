@@ -13,13 +13,17 @@
         function replace($tmpname){
             return  $this->manager->uploadfile($this->type,str_replace("/uploads/","",$this->media),$tmpname);
         }
-        function render(){
+        function render($caption=true){
             ?>
                 <figure class="tekmedia" id='<?php echo $this->id; ?>'>
-                    <figcaption>
-                        upload N<?php echo $this->id?>
-                    </figcaption>
-                    <?php
+                    <?php 
+                        if($caption){
+                            ?>
+                                <figcaption>
+                                    upload N<?php echo $this->id?>
+                                </figcaption>
+                            <?php
+                        }
                         if($this->type=='image'){
                             ?>
                                 <img src="<?php echo $this->media."?t=".time()."" ?>" alt="<?php echo 'uploaded file '.$this->id ?>">
@@ -124,14 +128,17 @@
             $upload = $this->manager->getupload($id);
             if($upload != null){
                 $upload->render();
+            }else{
+                'fialed retrieving media';
             }
         }
 
-        function select_elem($id,$ajaxpath="xaja.php"){
+        function select_elem($id,$ajaxpath=null){
+            $ajaxpath = $ajaxpath ? $ajaxpath : $this->manager->prefix."/xaja.php" ;
             $upload = $this->manager->getupload($id);
             if($upload){
                 ?>
-                    <form method="post" onsubmit='initupload(event,event.currentTarget)'>
+                    <form method="post" onsubmit='sendform(event,event.currentTarget)'>
                         <div class="field">
                             <input type="hidden" name="apath" value='<?php echo $ajaxpath ; ?>'>
                             <input type="hidden" name="tmaction" value='tmselectupload'>
@@ -148,8 +155,8 @@
             }
         }
 
-        function selectbox(){
-            $uploads = $this->manager->getuploads();
+        function selectbox($ajaxpath=null){
+                $uploads = $this->manager->getuploads();
                 ?>
                 <section id="tmselectbox">
                     <div id="tmviews">
@@ -158,6 +165,14 @@
                         ?>
                     </div>
                     <section id="tmactions">
+                        <div id="uploadaction">
+                            <h2>
+                                TELEVERSER UN MEDIA
+                            </h2>
+                            <?php
+                                $this->manager->render('uploadform')
+                            ?>
+                        </div>
                         <h3>
                             MEDIAS SELECTIONNEES
                         </h3>
@@ -233,7 +248,7 @@
 
         function uploadform(){
            ?>
-                <form enctype='multipart/formdata' method="post" onsubmit='initupload(event,event.currentTarget)'>
+                <form enctype='multipart/formdata' method="post" onsubmit='sendform(event,event.currentTarget)'>
                     <div class="field">
                         <label for="type">type</label>
                         <select name="type" id="type" class="entry">
@@ -259,11 +274,10 @@
         }
 
         function replaceform($id){
-            $ajaxpath = $ajaxpath ? $ajaxpath : $this->manager->prefix;
             $upload = $this->manager->getupload($id);
             if($upload){
                 ?>
-                    <form enctype='multipart/formdata' method="post" onsubmit='initupload(event,event.currentTarget)'>
+                    <form enctype='multipart/formdata' method="post" onsubmit='sendform(event,event.currentTarget)'>
                         <div class="field">
                             <label for="type">type</label>
                             <select name="type" id="type" class="entry">
@@ -307,12 +321,11 @@
             }
         }
 
-        function deleteform($id,$ajaxpath=''){
-            $ajaxpath = $ajaxpath ? $ajaxpath : $this->manager->prefix;
+        function deleteform($id){
             $upload = $this->manager->getupload($id);
             if($upload){
                 ?>
-                    <form method="post" onsubmit='initupload(event,event.currentTarget)'>
+                    <form method="post" onsubmit='sendform(event,event.currentTarget)'>
                         <div class="field">
                             <input type="hidden" name="tmaction" value='dodelete'>
                             <input type="hidden" name="id" value='<?php echo $upload->id ?>'>
@@ -403,6 +416,7 @@
 
         function getupload($id){
             $raw = $this->conn->select_uploads_entry($id);
+            
             if($raw and is_array($raw[0])){
                 return new TekMedia($raw[0],$this);
             }else{
@@ -422,8 +436,9 @@
             if($tmaction == 'dodelete' ){
                 echo $this->removefile($id) ? "success" : "failed" ;
             }
-            if($tmaction == 'getrender' ){
-                $args = [json_decode(isset($args) ? $args : "[]")];
+            if($tmaction == 'getrender' ){     
+                $args = json_decode(isset($args) ? $args : "[]");
+                $args = is_array($args) ? $args : [$args];
                 $this->render($render,...$args);
             }
         }
@@ -508,7 +523,7 @@
                     null,       //dbhost
                     'root',     //dbuser
                     null,       //dbpassword
-                    'tester'    //dbname
+                    'modular'    //dbname
                 );
                 $this->conn->__connect();
             }
@@ -529,6 +544,7 @@
             $this->prefix  = str_replace(str_replace($_SERVER['SCRIPT_NAME'],'',$_SERVER['SCRIPT_FILENAME']),'',dirname(__FILE__));
             $this->renders = new TekMediaRenders($this);
             $this->initdb();
+
                 // <script>
                 //     const tmprefix = `<?php// echo $this->prefix `
                 // </script> 
